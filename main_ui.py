@@ -44,6 +44,7 @@ class MainWindow(QMainWindow):
         self.button1 = page0.button1
         self.button2 = page0.button2
         self.button3 = page2.path_button
+        self.button4 = page1.button
 
         # 创建一个QListWidget用来作为左侧的导航栏
         self.list_widget = QListWidget(self)
@@ -186,8 +187,8 @@ class Data_Pages(QWidget):
         # 在这个QWidget上添加你的布局
         scroll_layout = QVBoxLayout(scroll_content)
 
-        button = QPushButton("获取数据", self)
-        button.clicked.connect(self.get_wish_data)
+        self.button = QPushButton("获取数据", self)
+        # button.clicked.connect(self.get_wish_data)
 
         title_font = QFont("黑体", 15)
         font = QFont("宋体", 12)
@@ -260,7 +261,7 @@ class Data_Pages(QWidget):
         qhbox3.addLayout(qvbox3)
         qhbox3.addWidget(standard_image_label)
 
-        scroll_layout.addWidget(button)
+        scroll_layout.addWidget(self.button)
         scroll_layout.addLayout(qhbox1)
         scroll_layout.addLayout(qhbox2)
         scroll_layout.addLayout(qhbox3)
@@ -276,26 +277,6 @@ class Data_Pages(QWidget):
         scaled_pixmap = pixmap.scaled(w, h, Qt.KeepAspectRatio)
         label.setPixmap(scaled_pixmap)
         label.setScaledContents(True)
-
-    def get_wish_data(self):
-        wish_path = read_ini()["wishlog"]
-        inspection = wish_path.split(".")[-1]
-        print(inspection)
-        if os.path.exists(wish_path) & (inspection == "json"):
-
-            message = run(wish_path)
-            self.showInfoBar(message)
-        else:
-            self.showInfoBar("wishlog路径错误!")
-            wish_path = open_file()
-            write_ini("wishlog", wish_path)
-            self.get_wish_data()
-
-    def showInfoBar(self, message):
-        infoBar = InfoBar(message, parent=self)
-        infoBar.show()
-        infoBar.adjustSize()
-        infoBar.move(self.width() / 2 - infoBar.width() / 2, self.height() - infoBar.height())
 
 
 class Album_Pages(QWidget):

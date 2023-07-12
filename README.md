@@ -2,7 +2,7 @@
   <img width="15%" align="center" src="https://z4a.net/images/2023/07/12/Yuanshen_Tool_logo.png" alt="logo">
 </p>
   <h1 align="center">
-  DIP ToolBox
+  Yuanshen Tool
 </h1>
 <p align="center">
 <img src="https://img.shields.io/badge/Version-v1.0-green?style=flat&logo">
