@@ -13,6 +13,9 @@ from infobar import InfoBar
 from get_show_data import get_data
 from data_analysis import run
 
+# 项目基础路径
+BASE_DIR = os.path.dirname(os.path.realpath(sys.argv[0]))
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -92,7 +95,7 @@ class Index_Pages(QWidget):
 
     def init(self):
         self.resize(800, 600)
-        index_image_path = "./image/index_image.png"
+        index_image_path = os.path.join(BASE_DIR, "image/index_image.png")
         self.index_image = QLabel("主页图像", self)
         # self.move(0,0)
         # self.index_image.setFixedSize(800, 500)
@@ -209,7 +212,7 @@ class Data_Pages(QWidget):
 
         character_all_label.move(50, 50)
         character_image_label = QLabel("角色活动祈愿", self)
-        pixmap1 = QPixmap("./image/角色活动祈愿.png")
+        pixmap1 = QPixmap(os.path.join(BASE_DIR, "image/角色活动祈愿.png"))
         self.load_image(pixmap1, character_image_label, 500, 500)
         qhbox1.addLayout(qvbox1)
         qhbox1.addWidget(character_image_label)
@@ -229,7 +232,7 @@ class Data_Pages(QWidget):
         weapon_all_label.move(50, 150)
         weapon_image_label = QLabel("武器活动祈愿", self)
         # weapon_all_label.move(150,50)
-        pixmap2 = QPixmap("./image/武器活动祈愿.png")
+        pixmap2 = QPixmap(os.path.join(BASE_DIR, "image/武器活动祈愿.png"))
         self.load_image(pixmap2, weapon_image_label, 500, 500)
 
         qhbox2.addLayout(qvbox2)
@@ -251,7 +254,7 @@ class Data_Pages(QWidget):
 
         standard_image_label = QLabel("常驻祈愿", self)
         # standard_all_label.move(150, 50)
-        pixma3 = QPixmap("./image/常驻祈愿.png")
+        pixma3 = QPixmap(os.path.join(BASE_DIR, "image/常驻祈愿.png"))
         self.load_image(pixma3, standard_image_label, 500, 500)
 
         qhbox3.addLayout(qvbox3)
@@ -282,8 +285,6 @@ class Data_Pages(QWidget):
 
             message = run(wish_path)
             self.showInfoBar(message)
-        elif wish_path == "":
-            return
         else:
             self.showInfoBar("wishlog路径错误!")
             wish_path = open_file()
@@ -305,7 +306,7 @@ class Album_Pages(QWidget):
 
     def init(self):
         self.albumWidget = QWidget(self)
-        self.path_button = QPushButton("打开相册路径", self)
+        self.path_button = QPushButton("打开相册", self)
         self.path_button.clicked.connect(self.get_album_path)
 
         self.album = QGridLayout()

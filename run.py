@@ -3,8 +3,19 @@ import os
 import subprocess
 import configparser
 from PyQt5.QtWidgets import QApplication, QFileDialog
+from PyQt5.QtGui import QIcon
 from main_ui import MainWindow
 from infobar import InfoBar
+
+# 设置任务栏图标
+import ctypes
+
+# 项目基础路径
+BASE_DIR = os.path.dirname(os.path.realpath(sys.argv[0]))
+
+ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("myappid")
+# 图标路径
+ICO_PATH = os.path.join(BASE_DIR, "./image/app.ico")
 
 wishlog_path = None
 album_path = None
@@ -112,5 +123,6 @@ def open_foler():
 
 window.button1.clicked.connect(open_game)
 window.button2.clicked.connect(open_album)
+window.setWindowIcon(QIcon(ICO_PATH))
 window.show()
 sys.exit(app.exec_())
