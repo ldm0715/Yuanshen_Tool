@@ -11,7 +11,7 @@ from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout
 from PyQt5.QtCore import Qt
 from infobar import InfoBar
 from get_show_data import get_data
-from data_analysis import run
+from data_analysis import data_run
 
 # 项目基础路径
 BASE_DIR = os.path.dirname(os.path.realpath(sys.argv[0]))
@@ -175,21 +175,32 @@ class Data_Pages(QWidget):
         self.init()
 
     def init(self):
-
-        # 创建一个滚动区域
-        scroll = QScrollArea()
-        # 设定滚动区域的widgetResizable属性为True，这将允许滚动区域自动调整其内容
-        scroll.setWidgetResizable(True)
-
-        # 创建一个QWidget作为滚动区域的内容
-        scroll_content = QWidget(scroll)
-
-        # 在这个QWidget上添加你的布局
-        scroll_layout = QVBoxLayout(scroll_content)
-
         self.button = QPushButton("获取数据", self)
-        # button.clicked.connect(self.get_wish_data)
+        self.button.clicked.connect(self.handle_button_click)
 
+        # 创建一个滚动区域和滚动区域的内容
+        self.scroll = QScrollArea()
+        self.scroll.setWidgetResizable(True)
+        self.scroll_content = QWidget(self.scroll)
+        self.scroll_layout = QVBoxLayout(self.scroll_content)
+
+        # 将滚动区域设置为窗口的布局
+        self.setLayout(QVBoxLayout(self))
+        self.layout().addWidget(self.button)
+        self.layout().addWidget(self.scroll)
+
+    def handle_button_click(self):
+        result = self.get_wish_data()
+        if result:
+            self.show_data()
+        else:
+            pass
+
+    def show_data(self):
+        # 清空滚动区域的内容
+        self.clear_scroll_content()
+
+        # 在滚动区域的内容上添加你的布局
         title_font = QFont("黑体", 15)
         font = QFont("宋体", 12)
 
@@ -211,7 +222,6 @@ class Data_Pages(QWidget):
         qvbox1.addWidget(character_label)
         qvbox1.addWidget(character_all_label)
 
-        character_all_label.move(50, 50)
         character_image_label = QLabel("角色活动祈愿", self)
         pixmap1 = QPixmap(os.path.join(BASE_DIR, "image/角色活动祈愿.png"))
         self.load_image(pixmap1, character_image_label, 500, 500)
@@ -230,9 +240,7 @@ class Data_Pages(QWidget):
         qvbox2.addWidget(weapon_label)
         qvbox2.addWidget(weapon_all_label)
 
-        weapon_all_label.move(50, 150)
         weapon_image_label = QLabel("武器活动祈愿", self)
-        # weapon_all_label.move(150,50)
         pixmap2 = QPixmap(os.path.join(BASE_DIR, "image/武器活动祈愿.png"))
         self.load_image(pixmap2, weapon_image_label, 500, 500)
 
@@ -248,35 +256,85 @@ class Data_Pages(QWidget):
                 f"四星概率:  {standard_4}\n三星概率:  {standard_3}\n五星平均抽取次数:  {standard_5_average}"
         standard_all_label = QLabel(info3, self)
         standard_all_label.setFont(font)
-        # standard_all_label.move(50, 250)
 
         qvbox3.addWidget(standard_label)
         qvbox3.addWidget(standard_all_label)
 
         standard_image_label = QLabel("常驻祈愿", self)
-        # standard_all_label.move(150, 50)
         pixma3 = QPixmap(os.path.join(BASE_DIR, "image/常驻祈愿.png"))
         self.load_image(pixma3, standard_image_label, 500, 500)
 
         qhbox3.addLayout(qvbox3)
         qhbox3.addWidget(standard_image_label)
 
-        scroll_layout.addWidget(self.button)
-        scroll_layout.addLayout(qhbox1)
-        scroll_layout.addLayout(qhbox2)
-        scroll_layout.addLayout(qhbox3)
+        self.scroll_layout.addLayout(qhbox1)
+        self.scroll_layout.addLayout(qhbox2)
+        self.scroll_layout.addLayout(qhbox3)
 
-        # 将QWidget设置为滚动区域的内容
-        scroll.setWidget(scroll_content)
+        # 刷新滚动区域的内容
+        self.scroll_content.setLayout(self.scroll_layout)
+        self.scroll.setWidget(self.scroll_content)
 
-        # 最后，将滚动区域设置为窗口的布局
-        self.setLayout(QVBoxLayout(self))
-        self.layout().addWidget(scroll)
+    def clear_scroll_content(self):
+        # 清空滚动区域的内容
+        while self.scroll_layout.count():
+            item = self.scroll_layout.takeAt(0)
+            if item.layout():
+                while item.layout().count():
+                    sub_item = item.layout().takeAt(0)
+                    if sub_item.widget():
+                        sub_item.widget().deleteLater()
+                    if sub_item.layout():
+                        while sub_item.layout().count():
+                            sub_sub_item = sub_item.layout().takeAt(0)
+                            if sub_sub_item.widget():
+                                sub_sub_item.widget().deleteLater()
+
+                item.layout().deleteLater()
+            if item.widget():
+                item.widget().deleteLater()
+
+    def get_wish_data(self):
+        wish_path = read_ini()["wishlog"]
+        inspection = wish_path.split(".")[-1]
+        print(inspection)
+        if os.path.exists(wish_path) & (inspection == "json"):
+
+            message = data_run(wish_path)
+            self.showInfoBar(message)
+            return True
+        else:
+            try:
+                self.clean_up(f"./image/角色活动祈愿.png")
+                self.clean_up(f"./image/武器活动祈愿.png")
+                self.clean_up(f"./image/常驻祈愿.png")
+                self.clean_up(f"./data/average_probability.json")
+                self.clean_up(f"./data/data_dict.json")
+                self.clean_up(f"./data/常驻祈愿.json")
+                self.clean_up(f"./data/武器活动祈愿.json")
+                self.clean_up(f"./data/角色活动祈愿.json")
+            except:
+                pass
+            finally:
+                message = "文件路径不存在,请重新选择"
+                self.showInfoBar(message)
+                return False
+
+    def clean_up(self, path):
+        file_name = path.split("/")[-1]
+        os.remove(path)
+        print(f"{file_name}已清空")
 
     def load_image(self, pixmap, label, w, h):
         scaled_pixmap = pixmap.scaled(w, h, Qt.KeepAspectRatio)
         label.setPixmap(scaled_pixmap)
         label.setScaledContents(True)
+
+    def showInfoBar(self, message):
+        infoBar = InfoBar(message, parent=self)
+        infoBar.show()
+        infoBar.adjustSize()
+        infoBar.move(self.width() / 2 - infoBar.width() / 2, self.height() - infoBar.height())
 
 
 class Album_Pages(QWidget):

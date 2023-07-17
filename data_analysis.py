@@ -14,6 +14,8 @@ plt.rc("font", family='SimHei', size=13)
 # 302	武器活动祈愿
 
 
+
+
 def get_data(path):
     file = open(path, "r", encoding="utf-8")
     json_data = json.load(file)
@@ -160,14 +162,15 @@ def get_pie_image(size, label, explode, title):
     plt.title(title)
     plt.tight_layout()
     plt.savefig(f"./image/{title}.png", dpi=200)
+    print(f"{title}图片保存成功！")
     plt.close()
 
 
-def run(path):
+def data_run(path):
     try:
         first_data = get_data(path)
         result_data = deal_data(first_data)
-        return "数据处理成功,请重启应用！"
+        return "数据处理成功！"
     except:
         return "或者不符合统一的json格式!"
 
@@ -175,5 +178,6 @@ def run(path):
 if __name__ == '__main__':
     # data_path = get_data()
     # path = deal_data("./data/data_dict.json")
-    path = "./data/Wishlog_163056907_20230711_113840.json"
-    run(path)
+    # path = "./data/Wishlog_163056907_20230711_113840.json"
+    path = ""
+    data_run(path)

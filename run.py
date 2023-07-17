@@ -6,7 +6,6 @@ from PyQt5.QtWidgets import QApplication, QFileDialog
 from PyQt5.QtGui import QIcon
 from main_ui import MainWindow
 from infobar import InfoBar
-from data_analysis import run
 
 # 设置任务栏图标
 import ctypes
@@ -40,7 +39,6 @@ def open_game():
         showInfoBar(window, message="游戏路径不存在,请重新选择")
         game_path = open_file()
         write_ini("game", game_path)
-        open_game()
 
 
 def open_album():
@@ -57,7 +55,7 @@ def open_album():
         showInfoBar(window, message="文件夹路径不存在,请重新选择")
         album_path = open_foler()
         write_ini("album", album_path)
-        open_album()
+        # open_album()
 
 
 def showInfoBar(window, message):
@@ -122,24 +120,9 @@ def open_foler():
         return folder_path
 
 
-def get_wish_data():
-    wish_path = read_ini()["wishlog"]
-    inspection = wish_path.split(".")[-1]
-    print(inspection)
-    if os.path.exists(wish_path) & (inspection == "json"):
-
-        message = run(wish_path)
-        showInfoBar(window, message)
-    else:
-        showInfoBar(window, "wishlog路径错误!")
-        wish_path = open_file()
-        write_ini("wishlog", wish_path)
-        get_wish_data()
-
-
 window.button1.clicked.connect(open_game)
 window.button2.clicked.connect(open_album)
-window.button4.clicked.connect(get_wish_data)
+# window.button4.clicked.connect(get_wish_data)
 window.setWindowIcon(QIcon(ICO_PATH))
 window.show()
 sys.exit(app.exec_())
